@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>尿布疹 AI 檢測</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container {
+            max-width: 500px; margin: auto; padding: 20px;
+            border: 1px solid #ccc; border-radius: 8px;
+        }
+        label { font-weight: bold; margin-top: 10px; display: block; }
+        input, textarea, button { width: 100%; padding: 10px; margin-top: 5px; }
+        button {
+            background-color: #4CAF50; color: white; border: none;
+            margin-top: 20px; padding: 12px; font-size: 16px;
+            border-radius: 6px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>尿布疹 AI 檢測表單</h2>
+
+    <form action="/submit_case" method="post" enctype="multipart/form-data">
+
+        <label>姓名：</label>
+        <input type="text" name="name" required>
+
+        <label>電話：</label>
+        <input type="text" name="phone" required>
+
+        <label>健保卡號：</label>
+        <input type="text" name="nh_card" required>
+
+        <label>身分證字號：</label>
+        <input type="text" name="id_number" required>
+
+        <label>Email：</label>
+        <input type="email" name="email" required>
+
+        <label>上傳照片：</label>
+        <input type="file" name="image" accept="image/*" required>
+
+        <button type="submit">送出檢測</button>
+    </form>
+</div>
+
+</body>
+</html>
