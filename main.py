@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -63,7 +63,17 @@ async def submit_case(
     with open(f"data/{case_id}.json", "w") as f:
         json.dump(record, f, ensure_ascii=False, indent=4)
 
-    return {"message": "已成功送出，AI 已收到資料"}
+    return RedirectResponse(url=f"/result/{case_id}", status_code=302)
+@app.get("/result/{case_id}", response_class=HTMLResponse)
+def result_page(request: Request, case_id: str):
+    path = f"data/{case_id}.json"
+    if not os.path.exists(path):
+        return HTMLResponse("<h3>找不到檢測結果。</h3>")
+
+    with open(path, "r") as f:
+        case = json.load(f)
+
+    return templates.TemplateResponse("result.html", {"request": request, "case": case})
 
 # 3. pending 給內網抓
 @app.get("/pending")
@@ -96,3 +106,4 @@ async def mark_as_taken(id: str):
 @app.get("/")
 def home():
     return {"message": "外網運作正常"}
+
