@@ -1,22 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>AI 檢測結果</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: auto;
+            padding: 25px;
+            background: #f0f2f5;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .ai-result {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .back-btn {
+            margin-top: 25px;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #005fcc;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>尿布疹 AI 檢測結果</h2>
+<div class="card">
+    <h2>AI 初步檢測結果</h2>
 
-<p>AI 判定等級：<b>{{ case.ai_level }}</b></p>
-<p>置信度：{{ case.ai_prob }}</p>
-<p>AI 建議：{{ case.ai_suggestion }}</p>
+    <div class="ai-result">
+        <p><b>AI 判斷級數：</b> Level {{ case.ai_level }}</p>
+        <p><b>判斷機率：</b> {{ "%.1f" % (case.ai_prob * 100) }}%</p>
+        <p><b>建議：</b> {{ case.ai_suggestion }}</p>
+    </div>
 
-<h3>上傳圖片</h3>
-<img src="{{ case.image_url }}" width="200">
-
-<hr>
-<p>⚠ 本結果僅供初步參考；如症狀惡化、滲液、出血、發燒，建議儘速就醫。</p>
+    <button class="back-btn" onclick="location.href='/form'">返回重新檢測</button>
+</div>
 
 </body>
 </html>
