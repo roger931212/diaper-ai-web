@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <title>AI 分析中...</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            padding: 50px;
+            background: #f0f2f5;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #007bff;
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #005fcc;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>AI 初步分析中...</h2>
+    <p>案件編號：<b>{{ case_id }}</b></p>
+    <p class="loading">請稍候 10–20 秒，您可手動重新整理查看結果。</p>
+
+    <button onclick="location.href='/result/{{ case_id }}'">查看結果</button>
+</div>
+
+</body>
+</html>
