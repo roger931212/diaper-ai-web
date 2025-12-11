@@ -62,25 +62,20 @@
 <h2>尿布疹 AI 初步檢測</h2>
 
 <form action="/submit_case" method="post" enctype="multipart/form-data">
+
     <label>姓名</label>
     <input type="text" name="name" required />
 
     <label>聯絡電話</label>
     <input type="text" name="phone" required />
 
-    <label>健保卡號</label>
-    <input type="text" name="nh_card" required />
-
-    <label>身分證字號</label>
-    <input type="text" name="id_number" required />
-
-    <label>電子郵件（會寄送結果）</label>
-    <input type="email" name="email" required />
+    <label>LINE ID</label>
+    <input type="text" name="line_id" required />
 
     <label>上傳患部照片（請清晰拍攝）</label>
     <input type="file" name="image" accept="image/*" required />
 
-    <button type="submit">提交資料</button>
+    <button type="submit">送出</button>
 </form>
 
 </body>
