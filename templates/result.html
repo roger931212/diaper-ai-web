@@ -20,14 +20,16 @@
             box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
         }
 
-        h2 {
-            text-align: center;
-        }
+        h2 { text-align: center; }
 
         .ai-result {
             padding: 10px;
             margin-top: 20px;
             font-size: 18px;
+        }
+
+        .pending {
+            color: #888;
         }
 
         .back-btn {
@@ -53,8 +55,17 @@
     <h2>AI 初步檢測結果</h2>
 
     <div class="ai-result">
-        <p><b>AI 判斷級數：</b> Level {{ case.ai_level }}</p>
-        <p><b>建議：</b> {{ case.ai_suggestion }}</p>
+        {% if case.ai_level is none %}
+            <p class="pending">AI 分析中，請稍候…（系統會自動更新）</p>
+            <script>
+                setTimeout(() => {
+                    window.location.reload();
+                }, 5000); // 5 秒刷新一次
+            </script>
+        {% else %}
+            <p><b>AI 判斷級數：</b> Level {{ case.ai_level }}</p>
+            <p><b>建議：</b> {{ case.ai_suggestion }}</p>
+        {% endif %}
     </div>
 
     <button class="back-btn" onclick="location.href='/form'">返回重新檢測</button>
