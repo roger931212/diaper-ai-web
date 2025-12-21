@@ -2,81 +2,185 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>尿布疹 AI 初步檢測 - 填寫資料</title>
 
     <style>
+        /* CSS Reset & 基本設定 */
+        * { box-sizing: border-box; }
+        
         body {
-            font-family: Arial;
-            max-width: 600px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 500px;
             margin: auto;
-            padding: 25px;
-            background: #f0f2f5;
+            padding: 20px;
+            background: #f4f6f8;
+            color: #333;
         }
 
         h2 {
             text-align: center;
+            color: #2c3e50;
             margin-bottom: 20px;
         }
 
         form {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        label { font-weight: bold; }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            margin-top: 15px;
+            color: #555;
         }
 
+        input[type="text"], 
+        input[type="tel"], 
         input[type="file"] {
-            padding: 6px;
-        }
-
-        button {
             width: 100%;
             padding: 12px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px; /* 防止 iOS 自動縮放 */
+            background: #fff;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* 提示文字 */
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* 圖片預覽區 */
+        #preview-container {
+            display: none;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #preview-img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 8px;
+            border: 2px solid #eee;
+        }
+
+        /* 按鈕樣式 */
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
             border: none;
             background: #007bff;
             color: white;
-            font-size: 16px;
-            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
-        button:hover {
-            background: #005fcc;
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* 簡單的隱私聲明 */
+        .privacy-note {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+            line-height: 1.5;
         }
     </style>
 </head>
 
 <body>
 
-<h2>尿布疹 AI 初步檢測</h2>
+<h2>👶 尿布疹 AI 檢測</h2>
 
-<form action="/submit_case" method="post" enctype="multipart/form-data">
+<form id="uploadForm" action="/submit_case" method="post" enctype="multipart/form-data">
 
-    <label>姓名</label>
-    <input type="text" name="name" required />
+    <label>家屬姓名</label>
+    <input type="text" name="name" placeholder="請輸入姓名" required />
 
     <label>聯絡電話</label>
-    <input type="text" name="phone" required />
+    <input type="tel" name="phone" placeholder="09xx-xxx-xxx" required />
 
     <label>LINE ID</label>
-    <input type="text" name="line_id" required />
+    <input type="text" name="line_id" placeholder="用於通知結果" required />
 
-    <label>上傳患部照片（請清晰拍攝）</label>
-    <input type="file" name="image" accept="image/*" required />
+    <label>上傳患部照片</label>
+    <input type="file" id="imageInput" name="image" accept="image/jpeg, image/png, image/jpg" required />
+    <span class="hint">請確保光線充足，支援 jpg/png，上限 6MB。</span>
 
-    <button type="submit">送出</button>
+    <div id="preview-container">
+        <img id="preview-img" src="#" alt="預覽圖片" />
+    </div>
+
+    <button type="submit" id="submitBtn">開始分析</button>
+
+    <div class="privacy-note">
+        本系統僅供學術研究參考，並非醫療診斷。<br>
+        您的照片與資料將在分析完成後自動刪除。
+    </div>
 </form>
+
+<script>
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('imageInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImg = document.getElementById('preview-img');
+    
+    // 設定最大檔案大小 (6MB)
+    const MAX_SIZE = 6 * 1024 * 1024; 
+
+    // 圖片預覽與大小檢查
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+
+        if (file) {
+            // 檢查大小
+            if (file.size > MAX_SIZE) {
+                alert(' 檔案太大囉！請上傳小於 6MB 的照片。');
+                this.value = ''; // 清空
+                previewContainer.style.display = 'none';
+                return;
+            }
+
+            // 顯示預覽
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    });
+
+    // 4. 優化：表單送出時的 Loading 狀態
+    form.addEventListener('submit', function(e) {
+        // 改變按鈕文字並鎖定，防止重複提交
+        submitBtn.disabled = true;
+        submitBtn.textContent = ' 資料上傳中，請稍候...';
+        submitBtn.style.background = '#6c757d'; // 變灰色
+    });
+</script>
 
 </body>
 </html>
