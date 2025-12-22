@@ -1,178 +1,165 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>AI 檢測結果</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>AI 檢測結果</title>
 
-    <style>
-        /* CSS Reset & 基本設定 */
-        * { box-sizing: border-box; }
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: #f4f6f8;
+      color: #333;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    h2 { margin-top: 0; color: #2c3e50; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            background: #f4f6f8;
-            color: #333;
-        }
+    .result-box {
+      margin: 20px 0;
+      padding: 20px;
+      background: #eef7ff;
+      border-radius: 8px;
+      border-left: 5px solid #007bff;
+      text-align: left;
+    }
+    .result-item { margin-bottom: 15px; font-size: 16px; }
+    .level-badge {
+      font-size: 28px;
+      font-weight: bold;
+      color: #d9534f;
+      display: block;
+      margin-top: 5px;
+    }
+    .suggestion-text {
+      color: #444;
+      line-height: 1.6;
+      margin-top: 5px;
+      white-space: pre-wrap;
+    }
 
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            text-align: center;
-        }
+    .loader {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #007bff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
 
-        h2 { margin-top: 0; color: #2c3e50; }
+    .status-text { color: #666; font-weight: bold; margin-bottom: 10px; }
+    .error-msg {
+      color: #dc3545;
+      background: #ffe6e6;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: left;
+      white-space: pre-wrap;
+    }
 
-        /* 結果區塊 */
-        .result-box {
-            margin: 20px 0;
-            padding: 20px;
-            background: #eef7ff;
-            border-radius: 8px;
-            border-left: 5px solid #007bff;
-            text-align: left;
-        }
+    .back-btn {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 24px;
+      background: #6c757d;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .back-btn:hover { background: #5a6268; }
 
-        .result-item {
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-        
-        .level-badge {
-            font-size: 28px; /*稍微加大一點，因為是重點*/
-            font-weight: bold;
-            color: #d9534f;
-            display: block;
-            margin-top: 5px;
-        }
-
-        .suggestion-text {
-            color: #444;
-            line-height: 1.6;
-            margin-top: 5px;
-            white-space: pre-wrap; /* 讓後端傳來的換行符號能正常顯示 */
-        }
-
-        /* 等待中的轉圈圈動畫 */
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #007bff;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .status-text {
-            color: #666;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        /* 錯誤訊息 */
-        .error-msg {
-            color: #dc3545;
-            background: #ffe6e6;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        /* 按鈕 */
-        .back-btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 24px;
-            background: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: background 0.2s;
-            width: 100%;
-        }
-
-        .back-btn:hover { background: #5a6268; }
-
-        .privacy-hint {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
+    .privacy-hint {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #999;
+      text-align: left;
+      line-height: 1.6;
+    }
+  </style>
 </head>
 
 <body>
-
 <div class="card">
-    
-    {% if case.status == 'done' %}
-        <h2> 檢測完成</h2>
-        
-        <div class="result-box">
-            <div class="result-item">
-                級數判定： 
-                <span class="level-badge">Level {{ case.ai_level }}</span>
-            </div>
-            
-            <div class="result-item">
-                照護建議：
-                <div class="suggestion-text">{{ case.ai_suggestion }}</div>
-            </div>
-        </div>
 
-        <div class="privacy-hint">
-            您的照片與個資已從系統中完整刪除。
-        </div>
+  {# ===== 完成：done 或 data_purged 都算完成（結果已寫入 stub）===== #}
+  {% if case.status in ['done', 'data_purged'] %}
+    <h2>檢測完成</h2>
 
-        <a href="/form" class="back-btn">返回首頁</a>
+    <div class="result-box">
+      <div class="result-item">
+        級數判定：
+        <span class="level-badge">Level {{ case.ai_level }}</span>
+      </div>
 
-    {% elif 'error' in (case.status or '') %}
-        <h2> 分析失敗</h2>
-        <div class="error-msg">
-            {% if case.status == 'error_image_too_large' %}
-                圖片過大，無法處理。請嘗試壓縮照片後再試。
-            {% elif case.status == 'error_missing_image' %}
-                找不到圖片檔案，請重新上傳。
-            {% else %}
-                系統發生未知錯誤，請聯絡管理員。
-            {% endif %}
-        </div>
-        <a href="/form" class="back-btn">重新上傳</a>
+      <div class="result-item">
+        照護建議：
+        <div class="suggestion-text">{{ case.ai_suggestion }}</div>
+      </div>
+    </div>
 
-    {% else %}
-        <h2>AI 分析中</h2>
-        
-        <div class="loader"></div>
-        
-        <p class="status-text">
-            {% if case.status == 'processing' %}
-                 正在進行影像運算...
-            {% else %}
-                 正在排隊等待分析...
-            {% endif %}
-        </p>
-        <p style="color:#999; font-size:13px;">請勿關閉視窗，系統將自動更新</p>
+    <div class="privacy-hint">
+      ※ 外網不顯示照片；外網端不長期保存照片與個資，資料由院內系統保存並由醫護人員後續確認。
+    </div>
 
-        <script>
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
-        </script>
-    {% endif %}
+    <a href="/form" class="back-btn">返回首頁</a>
+
+  {# ===== 錯誤：外網新版是 status="error"，並用 note 描述原因 ===== #}
+  {% elif case.status == 'error' %}
+    <h2>分析失敗</h2>
+
+    {% set note = (case.note or '') %}
+    <div class="error-msg">
+      {% if 'too large' in note.lower() %}
+        圖片過大，無法處理。請嘗試壓縮照片後再試。
+      {% elif 'missing' in note.lower() %}
+        找不到圖片檔案，請重新上傳。
+      {% else %}
+        系統發生錯誤：{{ note if note else '未知原因' }}
+      {% endif %}
+    </div>
+
+    <a href="/form" class="back-btn">重新上傳</a>
+
+  {# ===== 其他狀態：pending / processing ===== #}
+  {% else %}
+    <h2>AI 分析中</h2>
+
+    <div class="loader"></div>
+
+    <p class="status-text">
+      {% if case.status == 'processing' %}
+        正在進行影像運算...
+      {% else %}
+        正在排隊等待分析...
+      {% endif %}
+    </p>
+
+    <p style="color:#999; font-size:13px;">
+      請勿關閉視窗，系統將自動更新
+    </p>
+
+    <script>
+      setTimeout(function () {
+        window.location.reload();
+      }, 3000);
+    </script>
+  {% endif %}
 
 </div>
-
 </body>
 </html>
